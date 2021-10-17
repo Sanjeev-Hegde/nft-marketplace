@@ -16,3 +16,4 @@ This is a monorepo of NFT marketplace
 7. User adds a new item by uploading file and metadata to backend
 8. Bakend can store the file in file storages like s3 or ipfs and create publically accessible URL
 9. A new metadata object is also created and uploaded to s3/ipfs
+10. Frontend gets the metadata hash and creates a new transaction to add new item and signs and submits to backend
