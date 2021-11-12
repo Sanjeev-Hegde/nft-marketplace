@@ -4,11 +4,11 @@ import {Entity, model, property} from '@loopback/repository';
 export class Nft extends Entity {
 
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
     generated: true,
   })
-  id?: number;
+  id?: string;
 
 
   @property({

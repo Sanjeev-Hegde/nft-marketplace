@@ -1,9 +1,8 @@
-import { injectable,  BindingScope, service } from '@loopback/core';
+import { injectable, BindingScope, service } from '@loopback/core';
 import { HttpErrors } from '@loopback/rest';
 import { PinataPinResponse } from '@pinata/sdk';
-import { NftService } from '.';
 import { Item } from '../models';
-
+const { Readable } = require('stream');
 const pinataSDK = require('@pinata/sdk');
 const pinata = pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_API_SECRET);
 
@@ -18,36 +17,36 @@ export class IpfsService {
   }
 
 
-  uploadItem(file: Express.Multer.File, item: Partial<Item>): Promise<Partial<Item>> {
-    return new Promise(async (resolve, reject) => {
+  async uploadItem(file: Express.Multer.File, item: Partial<Item>): Promise<Partial<Item>> {
+    try{
       await this.checkIpfsConnection()
-        .catch((err: Error) => reject(new HttpErrors.GatewayTimeout("Failed to connect to Pinata Ipfs:" + err.toString())));
       let options = {
         pinataMetadata: {
           name: file.originalname,
         }
-      };
-      let fileIpfsResult = pinata.pinFileToIPFS(file.stream, options)
-        .catch((err: Error) => reject(new HttpErrors.InternalServerError("Unable pin file to Ipfs:" + err.toString())));
-
+      };    
+      //console.log(file.originalname);
+      const stream = Readable.from(file.buffer);
+      stream.path = file.originalname;
+      let fileIpfsResult = await pinata.pinFileToIPFS(stream, options);
       let metadataOptions = {
         pinataMetadata: {
           name: fileIpfsResult.IpfsHash + "_metadata",
         }
       };
       let metadata = {
-        name: "",  // get name from item
-        description: "", // get description from item
+        name: item.metadata?.name,  // get name from item
+        description: ""+item.metadata?.description, // get description from item
         image: "https://gateway.pinata.cloud/ipfs/" + fileIpfsResult.IpfsHash
       }
-
-      let result:PinataPinResponse = pinata.pinJSONToIPFS(metadata, metadataOptions)
-        .catch((err: Error) => reject(new HttpErrors.InternalServerError("Unable pin metadata:" + err.toString())));
-
-      item.tokenURL = "https://gateway.pinata.cloud/ipfs/" + result.IpfsHash;      
-      resolve(item);
-
-    });
+  
+      let result: PinataPinResponse = await pinata.pinJSONToIPFS(metadata, metadataOptions);
+      item.tokenURL = "https://gateway.pinata.cloud/ipfs/" + result.IpfsHash;
+      return item;
+    }catch(err){
+      console.log(err);
+      throw new HttpErrors.ExpectationFailed("Could not upload item to ipfs");
+    }
   }
 
 }

@@ -9,12 +9,12 @@ export class Item extends Entity {
   tokenId: string;
 
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
     generated: false,
     required: true,
   })
-  nftId: number;
+  nftId: string;
 
   @property({
     type: 'string',

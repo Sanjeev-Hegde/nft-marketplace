@@ -9,7 +9,7 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
-
+require('dotenv').config();
 export {ApplicationConfig};
 
 export class MarketplaceBackendApplication extends BootMixin(

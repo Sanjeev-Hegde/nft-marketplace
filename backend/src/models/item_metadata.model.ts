@@ -1,8 +1,8 @@
-export interface ItemProperty{
+export class ItemProperty{
     key:string;
     value:string;
 }
-export interface ItemMetadata {
+export class ItemMetadata {
     name:string;
     description?: string;
     properties?: ItemProperty[]

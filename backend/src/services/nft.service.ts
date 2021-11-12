@@ -20,7 +20,7 @@ export class NftService {
     return this.nftRepository.create(nft);
   }
 
-  getNft(id:number):Promise<Nft> {
+  getNft(id:string):Promise<Nft> {
     return this.nftRepository.findById(id);
   } 
 

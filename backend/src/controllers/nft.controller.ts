@@ -3,11 +3,12 @@ import { inject, service } from "@loopback/core";
 import { get, param, post, requestBody } from "@loopback/openapi-v3";
 import { HttpErrors, Request, RestBindings } from "@loopback/rest";
 import { RequestHandler, Response } from "express";
-import { Item, Nft } from "../models";
+import { Item, Nft, ItemMetadata } from "../models";
 import { NftService } from "../services";
 import { FILE_UPLOAD_SERVICE } from "../services/keys";
 import { AddressValidator, SupportedCurrency } from "./validators/address_validator";
-
+import {ItemMetadaSchema} from "../controllers/validators/schemas/item_metadata";
+import Ajv from "ajv";
 // import {inject} from '@loopback/core';
 
 
@@ -34,7 +35,7 @@ export class NftController {
       throw new HttpErrors.BadRequest("Contract Address not Valid");
     // TODO: Validate User address is actual owner of contract address from blockchain
 
-    return await this.nftService.createNft(nftCollection);
+    return this.nftService.createNft(nftCollection);
 
   }
 
@@ -49,43 +50,50 @@ export class NftController {
   async upload(
     @requestBody.file()
     request: Request,
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ): Promise<Partial<Item>> {
-    return new Promise<object>(async (resolve, reject) => {
-      let nftCollection: Nft = await this.nftService.getNft(id);
-      if (!nftCollection) throw new HttpErrors.NotFound("Nft Collection for the passed id does not exist")
-      this.handler(request, response, async (err: unknown) => {
-        if (err) reject(err);
-        else {
-          if(!(request.body instanceof Item))
-          throw new HttpErrors.BadRequest("Item Format not correct");
-
-          let extract = NftController.getFilesAndFields(request);
-          let item = await this.nftService.uploadItem(extract)
-            .catch((err: Error) => { throw err });
-          resolve(item);
-        }
-      });
-    });
+    await this.nftService.getNft(id);
+    let filesAndFields = await this.getFilesAndFields(request, response);
+    const ajv = new Ajv();
+    const validate = ajv.compile(ItemMetadaSchema);
+    let metadata = Object.assign({}, filesAndFields.fields);
+    if (!(validate(filesAndFields.fields))){
+      throw new HttpErrors.BadRequest(JSON.stringify(validate.errors));
+    }
+      
+    let item = new Item();
+    item.metadata = metadata;
+    let extract = { files: filesAndFields.files, item: item };
+    return this.nftService.uploadItem(extract);
   }
 
   /**
  * Get files and fields for the request
  * @param request - Http request
  */
-  private static getFilesAndFields(request: Request): { files: Express.Multer.File[], item: Partial<Item> } {
-    const uploadedFiles = request.files;
-    const mapper = (f: Express.Multer.File) => (f);
-    let files: Express.Multer.File[] = [];
-    if (Array.isArray(uploadedFiles)) {
-      files = uploadedFiles.map(mapper);
-    } else {
-      for (const filename in uploadedFiles) {
-        files.push(...uploadedFiles[filename].map(mapper));
-      }
-    }
-    return { files: files, item: request.body };
+  private getFilesAndFields(request: Request, response: Response): Promise<{ files: Express.Multer.File[], fields: any }> {
+    return new Promise((resolve, reject) => {
+      this.handler(request, response, (err: unknown) => {
+        if (err) reject(err);
+        else {
+          //TODO:
+          //reject(new HttpErrors.BadRequest("Item Format not correct"));  
+          const uploadedFiles = request.files;
+          const mapper = (f: Express.Multer.File) => (f);
+          let files: Express.Multer.File[] = [];
+          if (Array.isArray(uploadedFiles)) {
+            files = uploadedFiles.map(mapper);
+          } else {
+            for (const filename in uploadedFiles) {
+              files.push(...uploadedFiles[filename].map(mapper));
+            }
+          }
+          resolve({ files: files, fields: request.body });
+        }
+      });
+    });
+
   }
 
 }
