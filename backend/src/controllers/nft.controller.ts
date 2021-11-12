@@ -7,7 +7,7 @@ import { Item, Nft, ItemMetadata } from "../models";
 import { NftService } from "../services";
 import { FILE_UPLOAD_SERVICE } from "../services/keys";
 import { AddressValidator, SupportedCurrency } from "./validators/address_validator";
-import {ItemMetadaSchema} from "../controllers/validators/schemas/item_metadata";
+import { ItemMetadaSchema } from "../controllers/validators/schemas/item_metadata";
 import Ajv from "ajv";
 // import {inject} from '@loopback/core';
 
@@ -39,6 +39,23 @@ export class NftController {
 
   }
 
+
+  @get('/nft/collection/{id}')
+  async getCollection(@param.path.string('id') id: string): Promise<Nft> {
+    return this.nftService.getNft(id);
+  }
+
+  
+  @get('/nft/user/{id}/collection')
+  async getCollectionForUserId(@param.path.string('id') id: string): Promise<Nft[]> {
+    return this.nftService.getUserNfts(id);
+  }
+
+  @get('/nft/collection')
+  async getAllCollections(): Promise<Nft[]> {
+    return this.nftService.getAllNfts();
+  }
+
   /**
    * Endpoint to upload item and its metadata to ipfs and return metadata hash
    * 
@@ -58,10 +75,10 @@ export class NftController {
     const ajv = new Ajv();
     const validate = ajv.compile(ItemMetadaSchema);
     let metadata = Object.assign({}, filesAndFields.fields);
-    if (!(validate(filesAndFields.fields))){
+    if (!(validate(filesAndFields.fields))) {
       throw new HttpErrors.BadRequest(JSON.stringify(validate.errors));
     }
-      
+
     let item = new Item();
     item.metadata = metadata;
     let extract = { files: filesAndFields.files, item: item };

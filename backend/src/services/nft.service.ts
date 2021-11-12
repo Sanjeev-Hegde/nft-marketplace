@@ -22,6 +22,13 @@ export class NftService {
 
   getNft(id:string):Promise<Nft> {
     return this.nftRepository.findById(id);
+  }
+  getAllNfts():Promise<Nft[]> {
+    return this.nftRepository.find();
+  }
+  
+  getUserNfts(id:string):Promise<Nft[]> {
+    return this.nftRepository.find({where:{owner:id}});
   } 
 
   // only 1 Item allowed for now
