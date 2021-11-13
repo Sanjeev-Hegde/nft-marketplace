@@ -1,7 +1,11 @@
 .App {
   overflow-x: hidden;
 }
-
+.navbar {
+  border-bottom: 1px solid rgb(57, 102, 105,0.8);
+  box-shadow: 1px 3px #ebebeb;
+  
+}
 .App-header {
   /* background-color: #282c34; */
   /* background-color: rgb(206, 220, 250); */
@@ -18,4 +22,12 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.wallet-banner{
+  border: 0.5px solid;
+  border-radius:10px;
+  background-color:#396669;
+  color:white;
+  padding:5px
 }

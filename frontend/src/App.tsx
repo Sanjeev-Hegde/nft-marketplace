@@ -3,7 +3,7 @@ import Web3 from 'web3';
 import web3Modal from './common/web3modal';
 import './App.css';
 import NFT, { Collection, Item } from "./nft/nft"
-
+import Explore from './routes/explore/Explore';
 function App() {
   const [web3, setWeb3] = useState<Web3>();
   const [accounts, setAccounts] = useState<string[]>();
@@ -11,37 +11,48 @@ function App() {
   const [networkId, setNetwrkId] = useState<number>(-1);
   const networks: Record<number, string> = { 1: "Mainnet", 3: "Ropsten", 4: "Rinkeby", 5: "Goerli" };
   const [contractAddress, setContractAddress] = useState<string>();
+
+  async function initializeProvider(){    
+    const provider = await web3Modal.connect();
+    let web3 = new Web3(provider);
+    setWeb3(web3);
+    const accounts = await web3.eth.getAccounts();
+    const networkId = await web3.eth.net.getId();
+    // const chainId = await web3.eth.getChainId();
+    setNetwrkId(networkId);
+    setAccounts(accounts);
+    setDefaultAccount(accounts[0]);
+    provider.on("disconnect", (error: { code: number; message: string }) => {
+      console.log(error);
+      setWeb3(undefined);
+    });
+    provider.on("accountsChanged", (accounts: string[]) => {
+      setAccounts(accounts);
+      setDefaultAccount(accounts[0]);
+      console.log(accounts);
+    });
+    provider.on("networkChanged", (networkId: number) => {
+      console.log(networkId);
+      setNetwrkId(networkId);
+    });
+  }
+
   async function connectWallet() {
-    if(web3) {
+    if (web3) {
+      web3Modal.clearCachedProvider();
       setDefaultAccount(undefined);
       setWeb3(undefined);
     }
-    else{
-      const provider = await web3Modal.connect();
-      let web3 = new Web3(provider);
-      setWeb3(web3);
-      const accounts = await web3.eth.getAccounts();
-      const networkId = await web3.eth.net.getId();
-      // const chainId = await web3.eth.getChainId();
-      setNetwrkId(networkId);
-      setAccounts(accounts);
-      setDefaultAccount(accounts[0]);
-      provider.on("disconnect", (error: { code: number; message: string }) => {
-        console.log(error);
-        setWeb3(undefined);
-      });
-      provider.on("accountsChanged", (accounts: string[]) => {
-        setAccounts(accounts);
-        setDefaultAccount(accounts[0]);
-        console.log(accounts);
-      });
-      provider.on("networkChanged", (networkId: number) => {
-        console.log(networkId);
-        setNetwrkId(networkId);
-      });
+    else {
+      initializeProvider();
     }
   }
-
+  useEffect(()=>{
+    (async()=>{
+      console.log("called");
+      initializeProvider();
+    })();
+  },[]);
   function deployCollection() {
     // deploy only if we have valid account selected
     // TODO: verify whether account address is valid
@@ -80,24 +91,58 @@ function App() {
   return (
     <div className="App">
       <div className="row">
-        <div className="col-md-2" style={{paddingLeft:"20px"}}>
-          <img src={require('./assets/marketplace_icon.png').default} style={{width:130,height:100,float:'left'}}></img>
-        </div>
-        <div className="col-md-8" >
-          <div style={{ height: "100%",textAlign:"center",display:"table", width:"100%"}}>
-            <h1 style={{color:'#396669',display:"table-cell",verticalAlign:"middle"}}>P2P NFT Marketplace</h1>
-          </div>          
-        </div>
-        <div className="col-md-2" style={{display: "grid", textAlign:"center"}}>
-          <div style={{alignSelf:"center"}}>
-            <img src={require('./assets/wallet.png').default} style={{width:50,height:50, cursor: 'pointer' }} onClick={connectWallet} ></img>
-            <h6>{defaultAccount?"Connected":"Not Connected"}</h6>
-          </div>          
-        </div>               
+        <nav className="nav navbar justify-content-between fixed-top navbar-light" >
+          <div className="col-sm-3 " style={{ paddingLeft: "20px", display: "table" }}>
+            <img src={require('./assets/marketplace_icon.png').default} style={{ width: 110, height: 80, float: 'left' }}></img>
+            <h4 style={{ color: '#396669', display: "table-cell", verticalAlign: "middle" }}>P2P NFT Marketplace</h4>
+          </div>
+          <div className="col-sm-5 align-items-center mt-2 " 
+            style={{  verticalAlign: "middle", paddingLeft:"30px"}}>
+            <ul className="nav">
+            <input className="form-control" style={{width:350}}type="search" placeholder="Search" aria-label="Search"/>           
+              <li className="nav-item ">
+                <a className="nav-link active" style={{color:"#396669"}} aria-current="page" href="#">Explore</a>
+              </li>
+              <li className="nav-item ">
+                <a className="nav-link" style={{color:"#396669"}} href="#">Profile</a>
+              </li>
+              
+            </ul>
+          </div>
+          <div className="col-sm-4" style={{ display: "grid", textAlign: "center", padding: "5px" }}>
+            <div className={`${defaultAccount ? "wallet-banner" : ""}`} style={{ alignSelf: "center" ,padding:"5px"}}>
+              <div className="row">
+                <div className="col-md-8">
+                  <div style={{ float: 'right', textAlign: "left" }}>
+                    {
+                      defaultAccount &&
+                      <div>
+                        <span  >Network: {networks[networkId] ?? "Custom Network"}</span><br />
+                        <span style={{ fontSize: "0.7em" }} >Account: {accounts}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div className={`col-md-4 ${!defaultAccount?"wallet-banner":""}`} >
+                  <div >
+                    <img src={require('./assets/wallet.png').default} style={{ width: 50, height: 50, cursor: 'pointer' }} onClick={connectWallet} ></img>
+                  </div>
+                  {
+                    !defaultAccount &&
+                    <div style={{ marginTop: "-10px" }}>
+                      <span style={{ fontSize: "0.8em" }} >
+                        Not Connected
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
       </div>
-      <div style={{border:"1px solid",backgroundColor :"#396669",opacity:"7%"}}/>
       <header className="App-header">
-        <div style={{margin:"30px"}}>
+        <div style={{ textAlign: "center", marginTop: "140px" ,marginLeft:"20px", marginRight:"20px"}}>
           {web3 ?
             <div>
               {!defaultAccount ?
@@ -105,28 +150,29 @@ function App() {
                   <h2>Failed To Connect to Wallet</h2>
                 </div>
                 :
-                <div>
-                  <h3>Connected To Wallet Successfully</h3>
-                  <span>Network: {networks[networkId] ?? "Custom Network"}</span><br />
-                  <span>Wallet Accounts: {accounts}</span>
-                  <br /><br />
-                  {!contractAddress ?
-                    <div>
-                      <button className="btn btn-info" onClick={deployCollection}>Deploy New Collection</button><br /><br />
-                    </div>
-                    :
-                    <div>
-                      <br /><br />
-                      <h3>Collection Created Successfully</h3>
-                      <span>Collection Address: {contractAddress}</span><br /><br />
-                      <button className="btn btn-info" onClick={addItem}>Add Item</button>
-                    </div>
-                  }
+                <div >
+                  <Explore></Explore>
+                  <div>
+                    {!contractAddress ?
+                      <div>
+                        <button className="btn btn-info" onClick={deployCollection}>Deploy New Collection</button><br /><br />
+                      </div>
+                      :
+                      <div>
+                        <br /><br />
+                        <h3>Collection Created Successfully</h3>
+                        <span>Collection Address: {contractAddress}</span><br /><br />
+                        <button className="btn btn-info" onClick={addItem}>Add Item</button>
+                      </div>
+                    }
+                  </div>
+
                 </div>
+
               }
             </div>
             :
-            <div style={{textAlign:"center"}}>
+            <div >            
               <h2>Connect Your Wallet to Proceed</h2>
               <img src={require('./assets/wallet.png').default} style={{ width: "200px", height: "200px", cursor: 'pointer' }} onClick={connectWallet}></img>
             </div>
