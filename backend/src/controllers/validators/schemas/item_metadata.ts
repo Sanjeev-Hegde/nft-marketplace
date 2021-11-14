@@ -18,7 +18,8 @@ export const ItemMetadaSchema: JSONSchemaType<ItemMetadata> = {
         additionalProperties: false
       },
       nullable: true
-    }
+    },
+    ipfsHash:{type:"string"}
   },
   required: ["name"],
   additionalProperties: false

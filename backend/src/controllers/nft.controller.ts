@@ -1,7 +1,7 @@
 // Uncomment these imports to begin using these cool features!
 import { inject, service } from "@loopback/core";
 import { get, param, post, requestBody } from "@loopback/openapi-v3";
-import { HttpErrors, Request, RestBindings } from "@loopback/rest";
+import { getModelSchemaRef, HttpErrors, Request, RestBindings } from "@loopback/rest";
 import { RequestHandler, Response } from "express";
 import { Item, Nft, ItemMetadata } from "../models";
 import { NftService } from "../services";
@@ -45,7 +45,7 @@ export class NftController {
     return this.nftService.getNft(id);
   }
 
-  
+
   @get('/nft/user/{id}/collection')
   async getCollectionForUserId(@param.path.string('id') id: string): Promise<Nft[]> {
     return this.nftService.getUserNfts(id);

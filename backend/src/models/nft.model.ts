@@ -1,4 +1,5 @@
 import {Entity, model, property} from '@loopback/repository';
+import { Network } from './network.model';
 
 @model()
 export class Nft extends Entity {
@@ -35,6 +36,20 @@ export class Nft extends Entity {
   })
   contractAddress: string;
 
+  @property({
+    type: 'object',
+    required: true,
+    jsonSchema: {
+      properties:{
+        networkId:{type:'number'},
+        chainId:{type:'number'},
+        blockchain:{type:'string'}       
+      },
+      required:["networkId","chainId"],
+      additionalProperties:false
+    }
+  })
+  network: Network;
 
   constructor(data?: Partial<Nft>) {
     super(data);

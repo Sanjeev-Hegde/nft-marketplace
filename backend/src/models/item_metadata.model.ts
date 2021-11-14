@@ -5,5 +5,6 @@ export class ItemProperty{
 export class ItemMetadata {
     name:string;
     description?: string;
-    properties?: ItemProperty[]
+    properties?: ItemProperty[];
+    ipfsHash:string;
 }

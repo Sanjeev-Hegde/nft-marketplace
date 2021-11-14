@@ -32,7 +32,7 @@ export class MarketplaceBackendApplication extends BootMixin(
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
-    this.bootOptions = {
+    this.bootOptions = {      
       controllers: {
         // Customize ControllerBooter Conventions here
         dirs: ['controllers'],

@@ -1,10 +1,10 @@
 .App {
   overflow-x: hidden;
 }
-.navbar {
-  border-bottom: 1px solid rgb(57, 102, 105,0.8);
-  box-shadow: 1px 3px #ebebeb;
-  
+.navbar-custom {
+  border-bottom: 1px solid rgba(137, 155, 156, 0.6);
+  box-shadow: 1px 1px #ebebeb;
+  padding: 2px;
 }
 .App-header {
   /* background-color: #282c34; */

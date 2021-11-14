@@ -14,7 +14,13 @@ export class Item extends Entity {
     generated: false,
     required: true,
   })
-  nftId: string;
+  collectionId: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  owner: string; // owner changes on transfer
 
   @property({
     type: 'string',

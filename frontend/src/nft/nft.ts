@@ -1,24 +1,14 @@
 import Web3 from "web3";
 import { AbiItem } from 'web3-utils'
 import { TransactionReceipt } from 'web3-core'
-import abi  from "../contracts/nft/abi.json";
-import bin  from "../contracts/nft/bin.json";
+import abi from "../contracts/nft/abi.json";
+import bin from "../contracts/nft/bin.json";
+import { Collection, Item } from "../models/Nft";
+import { WalletDetails } from "../models/WalletDetails";
 
-export interface Collection {
-    web3:Web3,
-    name:string,
-    symbol:string,
-    account:string
-}
-export interface Item{
-    web3:Web3,
-    account:string,
-    contractAddress:string,
-    ipfsHash:string
-}
-function createCollection(collection:Collection): Promise<TransactionReceipt> {
+function createCollection(walletDetails: WalletDetails, collection: Collection): Promise<TransactionReceipt> {
     console.log("Creating Collection");
-    let web3:Web3 = collection.web3;
+    let web3: Web3 = walletDetails.web3;
     return new Promise((resolve, reject) => {
         var nftContract = new web3.eth.Contract(abi as AbiItem[]);
         var nft = nftContract.deploy({
@@ -28,34 +18,31 @@ function createCollection(collection:Collection): Promise<TransactionReceipt> {
                 collection.symbol,
             ]
         }).send({
-            from: collection.account
+            from: collection.owner
         })
-        .on('receipt', receipt =>{
-            console.log('Contract mined:');
-            console.log(receipt);
-            resolve(receipt);                        
-        })
-        .on('error', err=>{
-            console.error(err);
-            reject(err);
-        });
+            .on('receipt', receipt => {
+                console.log('Contract mined:');
+                console.log(receipt);
+                resolve(receipt);
+            })
+            .on('error', err => {
+                console.error(err);
+                reject(err);
+            });
     })
 
 }
 
-function addItem( item:Item) {
-    // console.log("account:"+account);
-    // console.log("contractAddress:"+contractAddress);
-    // console.log("ipfsHash:"+ipfsHash);
-    let web3:Web3 = item.web3;
+function addItem(walletDetails: WalletDetails, collection: Collection, item: Item) {
     return new Promise((resolve, reject) => {
+        let web3: Web3 = walletDetails.web3;
         const contractInstance = new web3.eth.Contract(
             abi as AbiItem[],
-            item.contractAddress,
+            collection.contractAddress,
         );
-        contractInstance.methods.addItem("ipfs://" + item.ipfsHash)
+        contractInstance.methods.addItem("ipfs://" + item.metadata.ipfsHash)
             .send({
-                from: item.account,
+                from: item.owner,
                 gas: '4700000',
                 gasPrice: '40000000000'
             }, (e: any, res: unknown) => {
@@ -69,7 +56,7 @@ function addItem( item:Item) {
     });
 
 }
-export default {    
+export default {
     createCollection,
     addItem
 }

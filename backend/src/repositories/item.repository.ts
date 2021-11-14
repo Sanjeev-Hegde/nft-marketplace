@@ -5,7 +5,7 @@ import {Item, ItemRelations} from '../models';
 
 export class ItemRepository extends DefaultCrudRepository<
   Item,
-  typeof Item.prototype.nftId,
+  typeof Item.prototype.collectionId,
   ItemRelations
 > {
   constructor(

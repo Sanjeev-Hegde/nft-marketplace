@@ -1,0 +1,7 @@
+.collection-box{
+    border: 0.5px solid rgb(57, 102, 105,0.4);;
+    border-radius:5px;
+    padding:5px;
+    box-shadow: 3px 3px 3px 3px #ebebeb; 
+    padding:10px;  
+}

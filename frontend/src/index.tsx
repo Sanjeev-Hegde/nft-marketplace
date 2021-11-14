@@ -1,21 +1,18 @@
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 import "bootstrap/dist/css/bootstrap.min.css";
-import {  BrowserRouter, Routes,Route } from 'react-router-dom';
-import AddItem from './routes/addItem/AddItem';
-import CreateCollection from './routes/createCollection/CreateCollection';
+
+import reportWebVitals from './reportWebVitals';
+import {  BrowserRouter, Routes,Route} from 'react-router-dom';
 import Explore from './routes/explore/Explore';
 import Profile from './routes/profile/Profile';
+import './index.css';
+import App from './App';
 ReactDOM.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App/>}>
         <Route path="explore" element={<Explore />} />
-        <Route path="profile" element={<Profile />} >
-          <Route path="create-nft-collection" element={<CreateCollection />} />
-          <Route path="explore" element={<AddItem />} />
+        <Route path="profile/:address" element={<Profile />} >        
         </Route>        
       </Route>
     </Routes>
