@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sanjeev-Hegde/NFT-Marketplace.git"
+    "url": "git+https://github.com/Sanjeev-Hegde/nft-marketplace.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Sanjeev-Hegde/NFT-Marketplace/issues"
+    "url": "https://github.com/Sanjeev-Hegde/nft-marketplace/issues"
   },
-  "homepage": "https://github.com/Sanjeev-Hegde/NFT-Marketplace",
+  "homepage": "https://github.com/Sanjeev-Hegde/nft-marketplace",
   "devDependencies": {
     "gh-pages": "^3.2.3"
   }
