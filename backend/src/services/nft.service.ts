@@ -3,12 +3,13 @@ import { repository } from '@loopback/repository';
 import { HttpErrors } from '@loopback/rest';
 import { IpfsService } from './ipfs.service';
 import { Item, Nft } from '../models';
-import { NftRepository } from '../repositories';
+import { ItemRepository, NftRepository } from '../repositories';
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class NftService {
   constructor(
-    @repository(NftRepository) private nftRepository:NftRepository,    
+    @repository(NftRepository) private nftRepository:NftRepository, 
+    @repository(ItemRepository) private itemRepository:ItemRepository,     
     @service(IpfsService) private ipfsService: IpfsService
   ) {}
 
@@ -31,11 +32,17 @@ export class NftService {
     return this.nftRepository.find({where:{owner:id}});
   } 
 
+  getCollectionItems(id:string):Promise<Item[]> {
+    return this.itemRepository.find({where:{collectionId:id}});
+  }
+
   // only 1 Item allowed for now
-  uploadItem(extract: {files:Express.Multer.File[],item:Partial<Item> }): Promise<Partial<Item>>{
+  async uploadItem(extract: {files:Express.Multer.File[],item:Item}): Promise<Item>{
     if(extract.files.length>1)
     throw new HttpErrors.BadRequest("Multiple Files Not Supported Yet");      
-    return this.ipfsService.uploadItem(extract.files[0],extract.item);  
+    let result = await this.ipfsService.uploadItem(extract.files[0],extract.item);
+    //console.log(result);
+    return this.itemRepository.create(result);
     //TODO: save item in database
   }
 

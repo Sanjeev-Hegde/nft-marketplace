@@ -1,7 +1,7 @@
 import { injectable, BindingScope, service } from '@loopback/core';
 import { HttpErrors } from '@loopback/rest';
 import { PinataPinResponse } from '@pinata/sdk';
-import { Item } from '../models';
+import { Item, ItemMetadata } from '../models';
 const { Readable } = require('stream');
 const pinataSDK = require('@pinata/sdk');
 const pinata = pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_API_SECRET);
@@ -17,7 +17,7 @@ export class IpfsService {
   }
 
 
-  async uploadItem(file: Express.Multer.File, item: Partial<Item>): Promise<Partial<Item>> {
+  async uploadItem(file: Express.Multer.File, item:Item): Promise<Partial<Item>> {
     try{
       await this.checkIpfsConnection()
       let options = {
@@ -34,14 +34,15 @@ export class IpfsService {
           name: fileIpfsResult.IpfsHash + "_metadata",
         }
       };
+      item.tokenURL = "https://gateway.pinata.cloud/ipfs/" + fileIpfsResult.IpfsHash;
       let metadata = {
         name: item.metadata?.name,  // get name from item
         description: ""+item.metadata?.description, // get description from item
-        image: "https://gateway.pinata.cloud/ipfs/" + fileIpfsResult.IpfsHash
+        image: item.tokenURL 
       }
-  
-      let result: PinataPinResponse = await pinata.pinJSONToIPFS(metadata, metadataOptions);
-      item.tokenURL = "https://gateway.pinata.cloud/ipfs/" + result.IpfsHash;
+      
+      let metadataResult: PinataPinResponse = await pinata.pinJSONToIPFS(metadata, metadataOptions);       
+      item.metadata.ipfsHash = metadataResult.IpfsHash;     
       return item;
     }catch(err){
       console.log(err);

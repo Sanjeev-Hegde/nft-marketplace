@@ -7,7 +7,7 @@ import { Item, Nft, ItemMetadata } from "../models";
 import { NftService } from "../services";
 import { FILE_UPLOAD_SERVICE } from "../services/keys";
 import { AddressValidator, SupportedCurrency } from "./validators/address_validator";
-import { ItemMetadaSchema } from "../controllers/validators/schemas/item_metadata";
+import {ItemSchema } from "./validators/schemas/ItemSchema";
 import Ajv from "ajv";
 // import {inject} from '@loopback/core';
 
@@ -57,6 +57,15 @@ export class NftController {
   }
 
   /**
+   *  Get All items of a Collection
+   * @param id  
+   * @returns 
+   */
+  @get('/nft/collection/{id}/items')
+  async getCollectionItems(@param.path.string('id') id: string): Promise<Item[]> {
+    return this.nftService.getCollectionItems(id);
+  }
+  /**
    * Endpoint to upload item and its metadata to ipfs and return metadata hash
    * 
    * @param request  
@@ -69,19 +78,22 @@ export class NftController {
     request: Request,
     @param.path.string('id') id: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
-  ): Promise<Partial<Item>> {
+  ): Promise<Item> {
     await this.nftService.getNft(id);
-    let filesAndFields = await this.getFilesAndFields(request, response);
+    let filesAndFields = await this.getFilesAndFields(request, response);    
     const ajv = new Ajv();
-    const validate = ajv.compile(ItemMetadaSchema);
-    let metadata = Object.assign({}, filesAndFields.fields);
-    if (!(validate(filesAndFields.fields))) {
+    const validate = ajv.compile(ItemSchema);
+    if (!filesAndFields.fields.item) {
+      throw new HttpErrors.BadRequest("Item Object is not present");
+    }
+    let object = Object.assign({}, JSON.parse(filesAndFields.fields.item));
+    object.metadata = Object.assign({}, object.metadata);
+    let dataToValidate= object;
+    if (!(validate(dataToValidate ))) {
       throw new HttpErrors.BadRequest(JSON.stringify(validate.errors));
     }
-
-    let item = new Item();
-    item.metadata = metadata;
-    let extract = { files: filesAndFields.files, item: item };
+    let item:Item = object;
+    let extract = { files: filesAndFields.files, item: item };    
     return this.nftService.uploadItem(extract);
   }
 

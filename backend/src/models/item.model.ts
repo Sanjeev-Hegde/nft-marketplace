@@ -5,12 +5,18 @@ import { ItemMetadata } from './item_metadata.model';
 export class Item extends Entity {
   @property({
     type: 'string',
+    id: true,
+    generated: true,
   })
-  tokenId: string;
+  id?: string;
+  
+  @property({
+    type: 'string',
+  })
+  tokenId?: string;
 
   @property({
     type: 'string',
-    id: true,
     generated: false,
     required: true,
   })
@@ -26,7 +32,7 @@ export class Item extends Entity {
     type: 'string',
     required: true,
   })
-  tokenURL: string;
+  tokenURL?: string;
 
   @property({
     type: 'object',
