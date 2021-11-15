@@ -5,6 +5,7 @@ import './App.css';
 import Profile from './routes/profile/Profile';
 import { WalletDetails } from './models/WalletDetails';
 import { Navbar, Container } from 'react-bootstrap';
+
 function App() {
   const [web3, setWeb3] = useState<Web3>();
   const [accounts, setAccounts] = useState<string[]>();
@@ -56,6 +57,7 @@ function App() {
       initializeProvider();
     })();
   }, []);
+
   // function deployCollection() {
   //   // deploy only if we have valid account selected
   //   // TODO: verify whether account address is valid

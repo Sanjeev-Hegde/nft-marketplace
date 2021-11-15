@@ -4,11 +4,15 @@ import './CreateCollection.css';
 import { WalletDetails } from "../../models/WalletDetails";
 import { Collection } from "../../models/Nft";
 import NftService from "../../common/NftService";
-
+import Loader from "react-loader-spinner";
+import { useState } from "react";
 export default function CreateCollection(props: any) {
+    let [isCreating, setIsCreating] = useState(false);
     let walletDetails: WalletDetails = props.walletDetails;
+    let displayCollections = props.displayCollections;
     const { register, handleSubmit } = useForm();
     const onSubmit = (data: { name: string, symbol: string }) => {
+        setIsCreating(true);
         let collection: Collection = {
             name: data.name,
             symbol: data.symbol,
@@ -25,19 +29,33 @@ export default function CreateCollection(props: any) {
             let result = await NftService.createCollection(collection);
             console.log("New Collection Craeted Successfully");
             console.log(result);
+            setIsCreating(false);
+            // Go Back to Explore view
+            displayCollections();
         }).catch(err => {
             console.log(err);
         });
     }
     return (
-        <div>
-            <div style={{ width: "400px" }} className=" collection-box" >
-                <h4> Create new NFT collection</h4>
+        <div className="d-flex justify-content-center container">
+            <div className={`collection-box ${isCreating ? "disable" : ""}`} >
+                <h4 style={{ display: "inline" }}> Create new NFT collection</h4> &nbsp;&nbsp;
+                {isCreating &&
+                    <div style={{ display: "inline", float: "right" }}>
+                        <div style={{ display: "inline-block"}}>Waiting for confirmation</div>&nbsp;
+                        <div style={{ display: "inline-block"}}><Loader
+                            type="Puff"
+                            color="#00BFFF"
+                            height={30}
+                            width={30}
+                        /></div>
+             
+                    </div>
+                }
                 <hr />
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="form-group">
                         <label >Name</label><br />
-                        {/* <small id="nameHelp" className="form-text text-muted">This name is used to uniquely identify your collection</small> */}
                         <input className="form-control" id="name" aria-describedby="nameHelp" placeholder="Enter collection name" {...register("name", { required: true })} />
                     </div>
                     <br />

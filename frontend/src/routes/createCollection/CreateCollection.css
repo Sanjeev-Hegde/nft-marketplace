@@ -5,3 +5,8 @@
     box-shadow: 3px 3px 3px 3px #ebebeb; 
     padding:10px;  
 }
+
+.disable{
+    pointer-events: none;
+    opacity: 0.7;
+}

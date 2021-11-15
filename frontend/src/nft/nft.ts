@@ -34,6 +34,7 @@ function createCollection(walletDetails: WalletDetails, collection: Collection):
 }
 
 function addItem(walletDetails: WalletDetails, collection: Collection, item: Item) {
+    console.log("Minting NFT");
     return new Promise((resolve, reject) => {
         let web3: Web3 = walletDetails.web3;
         const contractInstance = new web3.eth.Contract(

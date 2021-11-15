@@ -5,6 +5,7 @@ export interface Network{
 }
 
 export interface Collection {
+    id?:string,
     name:string,
     symbol:string,
     owner:string,
@@ -20,12 +21,12 @@ export interface ItemMetadata {
     name:string;
     description?: string;
     properties?: ItemProperty[],
-    ipfsHash:string
+    ipfsHash?:string
 }
 export interface Item{
     tokenId?:string,
     collectionId:string,
-    tokenURL: string,
+    tokenURL?: string,
     metadata:ItemMetadata,
     owner:string
 }

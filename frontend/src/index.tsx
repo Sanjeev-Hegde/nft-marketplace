@@ -7,13 +7,15 @@ import Explore from './routes/explore/Explore';
 import Profile from './routes/profile/Profile';
 import './index.css';
 import App from './App';
+import DisplayCollection from './routes/displayCollections/DisplayCollection';
+import DisplayItems from './routes/displayItems/DisplayItems';
 ReactDOM.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App/>}>
         <Route path="explore" element={<Explore />} />
-        <Route path="profile/:address" element={<Profile />} >        
-        </Route>        
+        <Route path="profile/:address" element={<Profile />} >                    
+        </Route>      
       </Route>
     </Routes>
   </BrowserRouter>,
