@@ -4,15 +4,14 @@ import {juggler} from '@loopback/repository';
 const config = {
   name: 'nftdb',
   connector: 'mongodb',
-  url: 'mongodb://localhost/nftdb',
-  host: 'localhost',
-  port: 27017,
-  user: '',
-  password: '',
-  database: 'nftdb',
+  url: process.env.MONGODB_URL,
+  host: process.env.MONGODB_HOST,
+  port: process.env.MONGODB_PORT,
+  user: process.env.MONGODB_USER,
+  password: process.env.MONGODB_PASSWORD,
+  database: process.env.MONGODB_DATABASE,
   useNewUrlParser: true
 };
-
 // Observe application's life cycle to disconnect the datasource when
 // application is stopped. This allows the application to be shut down
 // gracefully. The `stop()` method is inherited from `juggler.DataSource`.
