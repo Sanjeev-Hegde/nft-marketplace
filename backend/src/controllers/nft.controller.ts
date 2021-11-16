@@ -88,6 +88,7 @@ export class NftController {
     }
   
     let object = filesAndFields.fields.item;  
+    console.log(object);
     // Data sent from AWS Gateway/postman are converted to object instead of string before sending
     // Need to fix this   
     if(typeof object != 'object') 
@@ -95,6 +96,7 @@ export class NftController {
     
     object = Object.assign({}, filesAndFields.fields.item);
     object.metadata = Object.assign({}, object.metadata);
+    console.log(object);
     let dataToValidate= object;
     if (!(validate(dataToValidate ))) {
       throw new HttpErrors.BadRequest(JSON.stringify(validate.errors));
