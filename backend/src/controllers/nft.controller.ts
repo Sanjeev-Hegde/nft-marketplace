@@ -94,8 +94,8 @@ export class NftController {
     if(typeof object != 'object') 
     object = Object.assign({}, JSON.parse(filesAndFields.fields.item));
     // else
-    // object = Object.assign({}, filesAndFields.fields.item);
-    // object.metadata = Object.assign({}, object.metadata);
+    object = Object.assign({}, object);
+    object.metadata = Object.assign({}, object.metadata);
     console.log(object);
     let dataToValidate= object;
     if (!(validate(dataToValidate ))) {
