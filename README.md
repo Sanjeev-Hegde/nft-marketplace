@@ -1,19 +1,20 @@
 # NFT-Marketplace
-This is a monorepo of NFT marketplace
+This is a monorepo of P2P NFT marketplace
+
+##### This repository is free to be used. Dont forget to give Star if this is helpful
 
 ## Current Flow
-1. User Login using their wallet, currently Metamask
-2. User can create new Collection. For this the frontend creates a contract creation transaction and user signes and submits using metamask
-3. Frontend tracks contract and gets its address and stores once its mined successfully
-4. User uploads a new item to IPFS gets its hash
+1. User Login using their wallet, currently Metamask/Torus
+2. User can create new Collection. For this the frontend creates a contract creation transaction (ERC721) and user signes and submits using metamask
+3. Frontend tracks contract and gets its address and sends it to backend once it is mined successfully
+4. User uploads a new item to IPFS. For this frontend uploads using backend api, gets file hash and publically accessible URL. For this backend uses pinata cloud service to upload file and also its metadata JSON to IPFS.
 5. This hash is used to add new item to the collection. THis will be another contract transaction that user signs
+6. Metadata JSON follows standards followed by Opensea, so your contract and file can be easily read by Opensea or other marketplaces.
+7. The Generated contract address can be copied and you can list it in opensea  
 
-## Final Flow
-1. User Login using their wallet ( Metamask, Coinbase)
-2. User can create new Collection. For this frontend requests abi and binary from backend ( since there can be multiple interfaces like web and mobile contract source code needs to be maintained by backend )
-3. Fronted creates a contract creation transaction using abi and binary but only signs and submits the transaction to backend.
-4. Backend submits the transaction to blockchain and tracks events like mined contract address and stores it in central database against user address
-7. User adds a new item by uploading file and metadata to backend
-8. Bakend can store the file in file storages like s3 or ipfs and create publically accessible URL
-9. A new metadata object is also created and uploaded to s3/ipfs
-10. Frontend gets the metadata hash and creates a new transaction to add new item and signs and submits to backend
+## Things To Improve
+1. Support for multiple wallet, mobile based Qr code. This should be easy, since the platform already uses web3Modal.
+2. Support for Multiple networks. Right now the platform does allow to change network and create NFT, but the frontend and backend needs to be improved
+3. Allow Lazy Minting of Collection and items. 
+4. Create Exchange Contracts required for P2P trading 
+5. Backend currently doesnt track the live contract. This is required since the contract item ownership can change by listing in other marketplaces
