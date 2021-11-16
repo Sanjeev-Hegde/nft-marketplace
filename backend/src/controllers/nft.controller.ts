@@ -86,7 +86,14 @@ export class NftController {
     if (!filesAndFields.fields.item) {
       throw new HttpErrors.BadRequest("Item Object is not present");
     }
-    let object = Object.assign({}, JSON.parse(filesAndFields.fields.item));
+  
+    let object = filesAndFields.fields.item;  
+    // Data sent from AWS Gateway/postman are converted to object instead of string before sending
+    // Need to fix this   
+    if(typeof object != 'object') 
+    object = Object.assign({}, JSON.parse(filesAndFields.fields.item));
+    
+    object = Object.assign({}, filesAndFields.fields.item);
     object.metadata = Object.assign({}, object.metadata);
     let dataToValidate= object;
     if (!(validate(dataToValidate ))) {
